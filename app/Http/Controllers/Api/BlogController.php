@@ -52,7 +52,7 @@ class BlogController extends Controller
         if($blog){
             return response()->json([
                 $blog,
-                $blog->comments
+                $blog->with('comments')
             ]);
         }else{
             return response()->json([
