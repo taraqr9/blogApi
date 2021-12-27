@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register',[UserController::class,'register']);
 Route::post('/login',[UserController::class,'login']);
 
+// login with social credential
+Route::get('/login/github',[UserController::class,'redirectSocialLogin']);
+Route::get('/login/github-callback',[UserController::class,'callbackSocialLogin']);
+
+
 Route::group(["middleware"=>["auth:sanctum"]], function(){
     // User
     Route::get('/profile',[UserController::class,'profile']);

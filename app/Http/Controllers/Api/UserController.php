@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Socialite\Facades\Socialite;
 
 class UserController extends Controller
 {
@@ -36,7 +37,7 @@ class UserController extends Controller
     }
 
     // LOGIN API [POST]
-    public function login(Request $request) 
+    public function login(Request $request)
     {
         $request->validate([
             'email' => 'required|email',
@@ -50,17 +51,17 @@ class UserController extends Controller
         {
             if(Hash::check($request->password, $user->password))
             {
-                // create a token 
+                // create a token
                 $token = $user->createToken('auth_token')->plainTextToken;
 
-                // send a response 
+                // send a response
                 return response()->json([
                     'status' => 1,
                     'message'=> 'User logged in successfully',
                     'access_token' => $token,
                 ],200);
             }
-            
+
         }
         else
         {
@@ -68,6 +69,62 @@ class UserController extends Controller
                 'status' => 0,
                 'message' => 'User not found !!!'
             ], 404 );
+        }
+    }
+
+    // LOGIN API WITH SOCIAL PROFILE
+    public function redirectSocialLogin()
+    {
+
+        $url = Socialite::driver('github')
+            ->stateless()
+            ->redirect()
+            ->getTargetUrl();
+
+        return response()->json([
+            'status' => 1,
+            'message'=> 'Url generated successfully',
+            'authorization_url' => $url,
+        ]);
+    }
+
+    public function callbackSocialLogin(Request $request)
+    {
+
+        try {
+
+            $gitUser = Socialite::driver('github')->stateless()->user();
+            $isUser = User::where('email', $gitUser->email)->first();
+
+            if($isUser){
+
+                $token = $isUser->createToken('auth_token')->plainTextToken;
+                return response()->json([
+                    'status' => 1,
+                    'message'=> 'User logged in successfully',
+                    'access_token' => $token,
+                ]);
+
+            }else{
+                $user = new User();
+
+                $user->name = $gitUser->name;
+                $user->email = $gitUser->email;
+                $user->password = Hash::make(rand(100000,999999));
+
+                $user->save();
+                $token = $user->createToken('auth_token')->plainTextToken;
+
+                return response()->json([
+                    'status' => 1,
+                    'message'=> 'User created successfully',
+                    'access_token' => $token,
+                ]);
+            }
+
+
+        }catch (\Exception $exception){
+            return $exception->getMessage();
         }
     }
 
