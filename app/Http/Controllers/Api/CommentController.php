@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
-    // CREATE BLOG
+    // CREATE COMMENT
     public function create(Request $request)
     {
         $request->validate([
@@ -30,7 +30,7 @@ class CommentController extends Controller
         ]);
     }
 
-    // BLOG LIST
+    // COMMENT LIST
     public function comments()
     {
         return response()->json([
@@ -38,7 +38,7 @@ class CommentController extends Controller
         ]);
     }
 
-    // SINGLE POST
+    // SINGLE COMMENT
     public function singleComment($id)
     {
         if(Comment::find($id)){
@@ -53,7 +53,7 @@ class CommentController extends Controller
         
     }
 
-    // DELETE POST
+    // DELETE COMMENT
     public function delete($id)
     {
         $comment = Comment::find($id);
