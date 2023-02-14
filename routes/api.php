@@ -3,8 +3,6 @@
 use App\Http\Controllers\Api\BlogController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\UserController;
-use App\Models\Blog;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register',[UserController::class,'register']);
